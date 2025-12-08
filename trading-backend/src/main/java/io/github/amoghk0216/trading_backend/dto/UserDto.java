@@ -2,9 +2,8 @@ package io.github.amoghk0216.trading_backend.dto;
 
 import lombok.Data;
 
-@Data
-public class UserDto {
-    private String name;
-    private String email;
-    private String password;
-}
+public record UserDto (
+        String name,
+        String email,
+        String password
+){}
