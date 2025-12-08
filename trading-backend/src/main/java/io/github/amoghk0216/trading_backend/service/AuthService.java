@@ -38,23 +38,23 @@ public class AuthService {
     private RoleRepository roleRepository;
 
     public String login(UserDto userDto){
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword()));
-        UserDetails userDetails = userDetailsService.loadUserByUsername(userDto.getEmail());
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.email(), userDto.password()));
+        UserDetails userDetails = userDetailsService.loadUserByUsername(userDto.email());
 
         return jwtUtil.generateToken(userDetails);
     }
 
     public User register(UserDto userDto) throws Exception{
         User user = User.builder()
-                .name(userDto.getName())
-                .email(userDto.getEmail())
-                .password(passwordEncoder.encode(userDto.getPassword()))
+                .name(userDto.name())
+                .email(userDto.email())
+                .password(passwordEncoder.encode(userDto.password()))
                 .build();
 
         Role userRole = roleRepository.findByName("ROLE_USER").orElseThrow(() -> new Exception("Default role not found"));
         user.getRoles().add(userRole);
 
-        Optional<User> check = userRepository.findByEmail(userDto.getEmail());
+        Optional<User> check = userRepository.findByEmail(userDto.email());
 
         if(check.isPresent())
             throw new Exception("email already exists");
