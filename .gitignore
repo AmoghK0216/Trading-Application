@@ -3,6 +3,7 @@ trading-backend/.mvn/wrapper/maven-wrapper.jar
 trading-backend/!**/src/main/**/target/
 trading-backend/!**/src/test/**/target/
 trading-backend/.env
+trading-backend/*.md
 
 ### STS ###
 trading-backend/.apt_generated
