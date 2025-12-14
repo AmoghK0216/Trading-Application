@@ -2,9 +2,12 @@ package io.github.amoghk0216.trading_backend.service;
 
 import io.github.amoghk0216.trading_backend.client.CoinGeckoClient;
 import io.github.amoghk0216.trading_backend.dto.CoinResponseDto;
+import io.github.amoghk0216.trading_backend.dto.CoinSearchResultDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CoinService {
@@ -40,6 +43,18 @@ public class CoinService {
         } catch (Exception e) {
             logger.error("Service: Failed to fetch coin data for coinId: {} with currency: {}",
                 coinId, currency, e);
+            throw e;
+        }
+    }
+
+    public List<CoinSearchResultDto> searchCoins(String query){
+        logger.info("Service: Fetching search coins response for query: {}", query);
+        try{
+            List<CoinSearchResultDto> coins = coinGeckoClient.searchCoins(query);
+            logger.info("Service: Successfully fetched search coins response");
+            return coins;
+        }catch (Exception e){
+            logger.error("unable to retrieve coins for query: {}", query);
             throw e;
         }
     }
