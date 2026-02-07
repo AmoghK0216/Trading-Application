@@ -25,6 +25,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        // Skip JWT validation for auth endpoints
+        String path = request.getRequestURI();
+        if (path.startsWith("/auth/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String token = null;
         String email = null;
 
@@ -47,7 +54,13 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         if (token != null) {
-            email = jwtUtil.extractUsername(token);
+            try {
+                email = jwtUtil.extractUsername(token);
+            } catch (Exception e) {
+                // Token is invalid/expired - continue without authentication
+                filterChain.doFilter(request, response);
+                return;
+            }
         }
 
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
