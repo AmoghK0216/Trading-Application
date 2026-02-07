@@ -1,26 +1,11 @@
 import axios from 'axios'
 import { API_ENDPOINTS } from './constants/config'
-import { storage } from './utils/storage'
 import type { Coin } from './types/coin'
 import type { LoginCredentials, SignupCredentials } from './types/user'
 
 const api = axios.create({
   timeout: 10000,
-})
-
-// Request interceptor to add auth token
-api.interceptors.request.use(config => {
-  // Don't add token to login/signup requests
-  const isAuthEndpoint = config.url?.includes('/auth/login') || config.url?.includes('/auth/signup')
-  
-  if (!isAuthEndpoint) {
-    const token = storage.getToken()
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-  }
-  
-  return config
+  withCredentials: true, // Send cookies with requests
 })
 
 // Response interceptor for error handling
@@ -28,7 +13,6 @@ api.interceptors.response.use(
   response => response,
   error => {
     if (error.response?.status === 401) {
-      storage.removeToken()
       window.location.href = '/login'
     }
     return Promise.reject(error)
@@ -36,14 +20,16 @@ api.interceptors.response.use(
 )
 
 export const authApi = {
-  login: async (credentials: LoginCredentials): Promise<string> => {
-    const response = await api.post<string>(API_ENDPOINTS.AUTH.LOGIN, credentials)
-    return response.data
+  login: async (credentials: LoginCredentials): Promise<void> => {
+    await api.post(API_ENDPOINTS.AUTH.LOGIN, credentials)
   },
 
-  signup: async (credentials: SignupCredentials): Promise<string> => {
-    const response = await api.post<string>(API_ENDPOINTS.AUTH.SIGNUP, credentials)
-    return response.data
+  signup: async (credentials: SignupCredentials): Promise<void> => {
+    await api.post(API_ENDPOINTS.AUTH.SIGNUP, credentials)
+  },
+
+  logout: async (): Promise<void> => {
+    await api.post(API_ENDPOINTS.AUTH.LOGOUT)
   }
 }
 

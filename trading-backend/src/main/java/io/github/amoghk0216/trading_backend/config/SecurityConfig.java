@@ -32,7 +32,7 @@ public class SecurityConfig {
         return http.csrf(customizer -> customizer.disable())
                 .cors(cors -> {}) // Use default CORS configuration from CorsConfig
                 .authorizeHttpRequests(request -> request
-                        .requestMatchers("/health", "/auth/login", "/auth/signup", "/api/coins/**").permitAll()
+                        .requestMatchers("/health", "/auth/login", "/auth/signup", "/auth/logout", "/api/coins/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -10,9 +10,9 @@ export default function Dashboard() {
   const { logout } = useAuth()
   const { data: coins, isLoading, error } = useTopCoins()
 
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
+  const handleLogout = async () => {
+    await logout()
+    // Navigation handled in logout method
   }
 
   return (

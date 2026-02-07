@@ -1,11 +1,11 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { storage } from '../utils/storage'
+import { createContext, useContext, useState, ReactNode } from 'react'
+import { authApi } from '../api'
 
 interface AuthContextType {
-  token: string | null
   isAuthenticated: boolean
-  login: (token: string) => void
-  logout: () => void
+  isLoading: boolean
+  login: () => void
+  logout: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -15,28 +15,26 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [token, setToken] = useState<string | null>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(true) // Assume authenticated by default
+  const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    const savedToken = storage.getToken()
-    if (savedToken) {
-      setToken(savedToken)
-    }
-  }, [])
-
-  const login = (newToken: string) => {
-    storage.setToken(newToken)
-    setToken(newToken)
+  const login = () => {
+    setIsAuthenticated(true)
   }
 
-  const logout = () => {
-    storage.removeToken()
-    setToken(null)
+  const logout = async () => {
+    try {
+      await authApi.logout()
+      setIsAuthenticated(false)
+      window.location.href = '/login'
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
   }
 
   const value = {
-    token,
-    isAuthenticated: !!token,
+    isAuthenticated,
+    isLoading,
     login,
     logout
   }

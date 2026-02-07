@@ -19,8 +19,8 @@ export default function Login() {
     setLoading(true)
 
     try {
-      const token = await authApi.login({ email, password })
-      login(token)
+      await authApi.login({ email, password })
+      login() // Update auth state
       navigate('/dashboard')
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } }; message?: string }
