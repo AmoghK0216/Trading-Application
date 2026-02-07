@@ -1,5 +1,15 @@
 package io.github.amoghk0216.trading_backend.service;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import io.github.amoghk0216.trading_backend.client.CoinGeckoClient;
 import io.github.amoghk0216.trading_backend.dto.CoinResponseDto;
 import io.github.amoghk0216.trading_backend.dto.WatchlistItemDto;
@@ -7,16 +17,6 @@ import io.github.amoghk0216.trading_backend.model.User;
 import io.github.amoghk0216.trading_backend.model.Watchlist;
 import io.github.amoghk0216.trading_backend.repository.UserRepository;
 import io.github.amoghk0216.trading_backend.repository.WatchlistRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.web.webauthn.api.CredProtectAuthenticationExtensionsClientInput;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class WatchlistService {
