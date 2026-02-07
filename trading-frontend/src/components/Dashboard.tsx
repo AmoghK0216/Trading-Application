@@ -1,51 +1,18 @@
-import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getTopCoins, Coin } from '../api'
+import { useAuth } from '../context/AuthContext'
+import { useTopCoins } from '../hooks/useCoins'
+import { formatPrice, formatPercentage } from '../utils/formatters'
+import { Button } from './common/Button'
+import { CoinCardSkeleton } from './common/Skeleton'
 
 export default function Dashboard() {
-  const [coins, setCoins] = useState<Coin[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
   const navigate = useNavigate()
-
-  useEffect(() => {
-    fetchCoins()
-  }, [])
-
-  const fetchCoins = async () => {
-    try {
-      setLoading(true)
-      setError('')
-      const token = localStorage.getItem('token')
-      if (!token) {
-        navigate('/login')
-        return
-      }
-      const data = await getTopCoins(token)
-      setCoins(data)
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to fetch coins')
-    } finally {
-      setLoading(false)
-    }
-  }
+  const { logout } = useAuth()
+  const { data: coins, isLoading, error } = useTopCoins()
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
+    logout()
     navigate('/login')
-  }
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(price)
-  }
-
-  const formatPercentage = (percentage: number) => {
-    return `${percentage >= 0 ? '+' : ''}${percentage.toFixed(2)}%`
   }
 
   return (
@@ -54,12 +21,9 @@ export default function Dashboard() {
       <header className="bg-primary-800 border-b border-primary-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold text-primary-50">Crypto Trading</h1>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-primary-700 text-primary-100 rounded-lg hover:bg-primary-600 transition-colors"
-          >
+          <Button variant="secondary" onClick={handleLogout}>
             Logout
-          </button>
+          </Button>
         </div>
       </header>
 
@@ -69,20 +33,21 @@ export default function Dashboard() {
           <p className="text-primary-300">Top 3 cryptocurrencies by market cap</p>
         </div>
 
-        {loading && (
-          <div className="text-center py-12">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-accent-400 border-r-transparent"></div>
-            <p className="mt-4 text-primary-300">Loading coins...</p>
+        {isLoading && (
+          <div className="grid gap-6 md:grid-cols-3">
+            <CoinCardSkeleton />
+            <CoinCardSkeleton />
+            <CoinCardSkeleton />
           </div>
         )}
 
         {error && (
           <div className="bg-error/10 border border-error text-error px-4 py-3 rounded-lg">
-            {error}
+            {(error as Error).message || 'Failed to fetch coins'}
           </div>
         )}
 
-        {!loading && !error && (
+        {!isLoading && !error && coins && (
           <div className="grid gap-6 md:grid-cols-3">
             {coins.map(coin => (
               <div
@@ -123,6 +88,10 @@ export default function Dashboard() {
             ))}
           </div>
         )}
+
+        <div className="mt-8 text-center text-primary-400 text-sm">
+          <p>Only fetching 3 popular coins to avoid CoinGecko API rate limits ⚡</p>
+        </div>
       </main>
     </div>
   )

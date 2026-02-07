@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { login } from '../api'
+import { useAuth } from '../context/AuthContext'
+import { authApi } from '../api'
+import { Button } from './common/Button'
+import { Input } from './common/Input'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -8,6 +11,7 @@ export default function Login() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const { login } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -15,11 +19,12 @@ export default function Login() {
     setLoading(true)
 
     try {
-      const token = await login(email, password)
-      localStorage.setItem('token', token)
+      const token = await authApi.login({ email, password })
+      login(token)
       navigate('/dashboard')
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.')
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } }; message?: string }
+      setError(error.response?.data?.message || error.message || 'Login failed. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -39,35 +44,27 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-primary-200 mb-2">
-                Email Address
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-primary-800 border border-primary-700 rounded-lg text-primary-50 placeholder-primary-500 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-transparent transition-colors"
-                placeholder="you@example.com"
-              />
-            </div>
+            <Input
+              id="email"
+              type="email"
+              label="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              fullWidth
+              required
+            />
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-primary-200 mb-2">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 bg-primary-800 border border-primary-700 rounded-lg text-primary-50 placeholder-primary-500 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-transparent transition-colors"
-                placeholder="••••••••"
-              />
-            </div>
+            <Input
+              id="password"
+              type="password"
+              label="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              fullWidth
+              required
+            />
           </div>
 
           {error && (
@@ -76,13 +73,9 @@ export default function Login() {
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg text-white bg-accent-500 hover:bg-accent-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
-          >
-            {loading ? 'Signing in...' : 'Sign In'}
-          </button>
+          <Button type="submit" loading={loading} fullWidth>
+            Sign In
+          </Button>
         </form>
       </div>
     </div>

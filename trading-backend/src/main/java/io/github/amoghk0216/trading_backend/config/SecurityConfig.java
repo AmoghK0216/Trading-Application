@@ -31,6 +31,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(customizer -> customizer.disable())
+                .cors(cors -> {}) // Use default CORS configuration from CorsConfig
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/health", "/auth/login", "/auth/signup", "/api/coins/**").permitAll()
                         .anyRequest().authenticated()
