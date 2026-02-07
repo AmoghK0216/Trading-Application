@@ -10,6 +10,6 @@ public class HealthController {
 
     @GetMapping("/health")
     public ResponseEntity<String> heatlh(){
-        return new ResponseEntity<String>("Welcome to the Application", HttpStatus.OK);
+        return new ResponseEntity<>("Welcome to the Application", HttpStatus.OK);
     }
 }

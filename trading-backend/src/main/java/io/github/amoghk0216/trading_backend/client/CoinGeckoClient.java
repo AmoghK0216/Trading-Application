@@ -1,5 +1,17 @@
 package io.github.amoghk0216.trading_backend.client;
 
+import java.time.Duration;
+import java.util.Collections;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+
 import io.github.amoghk0216.trading_backend.dto.CoinResponseDto;
 import io.github.amoghk0216.trading_backend.dto.CoinSearchResultDto;
 import io.github.amoghk0216.trading_backend.dto.external.CoinGeckoApiResponseDto;
@@ -7,20 +19,7 @@ import io.github.amoghk0216.trading_backend.dto.external.CoinGeckoMapper;
 import io.github.amoghk0216.trading_backend.dto.external.CoinGeckoSearchResponse;
 import io.github.amoghk0216.trading_backend.exception.CoinNotFoundException;
 import io.github.amoghk0216.trading_backend.exception.ExternalApiException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
-
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 @Component
 public class CoinGeckoClient {
@@ -40,6 +39,7 @@ public class CoinGeckoClient {
         return getCoinById(coinId, "usd");
     }
 
+    @SuppressWarnings("UseSpecificCatch")
     public CoinResponseDto getCoinById(String coinId, String currency){
         logger.info("Fetching coin data for coinId: {} with currency: {}", coinId, currency);
 
