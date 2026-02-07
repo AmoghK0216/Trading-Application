@@ -38,4 +38,13 @@ public class CoinController {
         logger.debug("Sucessfully fetched search results for query: {}", query);
         return ResponseEntity.ok(coins);
     }
+
+    @GetMapping("/bulk")
+    public ResponseEntity<List<CoinResponseDto>> getBulkCoins(@RequestParam String ids) {
+        logger.debug("Received bulk request for coin ids: {}", ids);
+        List<String> coinIds = List.of(ids.split(","));
+        List<CoinResponseDto> coins = coinService.getCoinsByIds(coinIds);
+        logger.debug("Successfully returned {} coins", coins.size());
+        return ResponseEntity.ok(coins);
+    }
 }

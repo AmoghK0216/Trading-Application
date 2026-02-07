@@ -58,4 +58,16 @@ public class CoinService {
             throw e;
         }
     }
+
+    public List<CoinResponseDto> getCoinsByIds(List<String> coinIds){
+        logger.info("Service: Fetching coins for ids: {}", coinIds);
+        try{
+            List<CoinResponseDto> coins = coinGeckoClient.getCoinsByIds(coinIds);
+            logger.info("Service: Successfully fetched {} coins", coins.size());
+            return coins;
+        }catch (Exception e){
+            logger.error("unable to retrieve coins for ids: {}", coinIds);
+            throw e;
+        }
+    }
 }
